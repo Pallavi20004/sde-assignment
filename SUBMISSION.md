@@ -1,14 +1,12 @@
 # Post-Call Processing Pipeline — Design Document
 
 **Author:** PALLAVI C O
+
 **Date:** 27 June 2026
 
 ---
 
 ## 1. Assumptions
-
-_State every assumption you made about the business, system, or environment. Be specific. These will be discussed in the follow-up._
-
 1.  Multiple customers can run campaigns simultaneously.
 2. Each completed call generates a transcript before post-call processing starts.
 3. The LLM provider enforces strict request-per-minute and token-per-minute limits.
@@ -16,14 +14,8 @@ _State every assumption you made about the business, system, or environment. Be 
 5. Exotel recordings may become available anytime between 10 and 120 seconds after a call ends.
 6. Dashboard users expect near real-time analysis results.
 7. A failed downstream action (CRM, WhatsApp, etc.) should not prevent the analysis result from being stored.
- 
-
----
 
 ## 2. Problem Diagnosis
-
-_Before designing anything: what is actually broken, and why does it break at scale? In your own words._
-
 
 1.The current system works for small workloads but does not scale to large campaigns. Every completed call follows the same sequential pipeline, causing unnecessary delays. The recording step blocks the LLM analysis even though both tasks are independent.
 
@@ -33,10 +25,11 @@ _Before designing anything: what is actually broken, and why does it break at sc
 
 ## 3. Architecture Overview
 
-_End-to-end flow from call-end webhook to completed analysis. Include a diagram._
-
 ```
-The redesigned architecture separates independent tasks and introduces rate-limit-aware processing. Instead of executing all operations sequentially, recording retrieval and transcript analysis are handled independently. This reduces overall processing time and prevents unnecessary delays.
+*  The redesigned architecture separates independent tasks and introduces rate-limit-aware processing.
+*  Instead of executing all operations sequentially, recording retrieval and transcript analysis
+      are handled independently.
+*  This reduces overall processing time and prevents unnecessary delays.
 
                   Call Ends
                         │
@@ -76,8 +69,6 @@ The redesigned architecture separates independent tasks and introduces rate-limi
 ---
 
 ## 4. Rate Limit Management
-
-_This is the primary problem. How does your system respect LLM rate limits across 100K calls?_
 
 The system uses a Redis-based rate limiter to track token usage before sending requests to the LLM.
 
@@ -214,10 +205,6 @@ Alerts should be generated when:
 
 _Schema changes required. Show the SQL._
 
-```sql
--- Your schema additions/changes here
-```
-
 ---
 The following schema changes are required.
 
@@ -289,9 +276,6 @@ Although the proposed design improves scalability and reliability, some limitati
 - Additional monitoring dashboards would further improve operational visibility.
 
 ## 15. What I Would Do With More Time
-
-_Specific, prioritised list — not a generic wishlist._
-
 1. Implement dynamic customer token allocation based on real-time demand.
 2. Add monitoring dashboards using Prometheus and Grafana.
 3. Introduce dead-letter queues for permanently failed tasks.
