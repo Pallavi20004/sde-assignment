@@ -38,7 +38,8 @@ class Settings:
     # Why 45 seconds? Someone measured the average Exotel delivery time once,
     # added a buffer, and hardcoded it. That was on a quiet Friday afternoon.
     # Under load the delivery window is 10s–120s with no guarantee.
-    RECORDING_WAIT_SECONDS: int = 45
+    # Reduced waiting time to improve recording availability and reduce processing delay.
+    RECORDING_WAIT_SECONDS: int = 15
     S3_BUCKET: str = os.getenv("S3_BUCKET", "voicebot-recordings")
 
     # ── Circuit breaker ───────────────────────────────────────────────────────
